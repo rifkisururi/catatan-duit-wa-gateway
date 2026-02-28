@@ -36,9 +36,19 @@ export default async function DashboardPage() {
               chatLogs: true,
             },
           },
+          chatLogs: {
+            orderBy: { sentAt: "desc" },
+            take: 1,
+          },
         },
       }),
     ]);
+
+  // Add lastMessageAt from the most recent chat log
+  const usersWithLastMessage = users.map((user) => ({
+    ...user,
+    lastMessageAt: user.chatLogs[0]?.sentAt || null,
+  }));
 
   const stats = [
     {
@@ -117,7 +127,7 @@ export default async function DashboardPage() {
                   Semua Users ({totalUsers})
                 </h2>
               </div>
-              <UserList users={users} />
+              <UserList users={usersWithLastMessage} />
             </div>
           </div>
 
