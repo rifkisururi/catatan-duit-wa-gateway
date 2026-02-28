@@ -132,14 +132,30 @@ export async function POST(request: NextRequest) {
           console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
         }
       } else {
-        const invalidLoginMessage = `❌ *Token login tidak valid atau sudah kadaluarsa.*\n\nSilakan minta token baru dari halaman login.`;
         console.log(`⚠️  [WEBHOOK] Invalid login token`);
 
-        // Send reply via WhatsApp
-        console.log(`📱 [WEBHOOK] Sending login reply to ${phoneNumber}...`);
+        // Send CTA button to login page
+        const baseUrl = process.env.NEXTAUTH_URL || request.nextUrl.origin;
+        const loginUrl = `${baseUrl}/user/login`;
+
+        console.log(`📱 [WEBHOOK] Sending CTA button to login page for ${phoneNumber}...`);
         try {
-          await sendWhatsAppMessage(phoneNumber, invalidLoginMessage);
-          console.log(`✅ [WEBHOOK] Login reply sent successfully`);
+          await sendWhatsAppCTAButton(
+            phoneNumber,
+            "❌ Token Login Tidak Valid",
+            "Token login Anda tidak valid atau sudah kadaluarsa. Silakan minta token baru dari halaman login.",
+            "🔑 Ke Halaman Login",
+            loginUrl
+          );
+          console.log(`✅ [WEBHOOK] CTA button sent successfully`);
+
+          // Send error reaction to original message
+          try {
+            await sendWhatsAppReaction(phoneNumber, message.id, "❌");
+            console.log(`✅ [WEBHOOK] Error reaction sent`);
+          } catch (reactionError) {
+            console.error("⚠️  [WEBHOOK] Failed to send error reaction:", reactionError);
+          }
         } catch (waError) {
           console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
         }
