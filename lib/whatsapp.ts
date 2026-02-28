@@ -4,6 +4,9 @@ export async function sendWhatsAppMessage(
   to: string,
   message: string
 ): Promise<void> {
+  console.log(`📱 [WHATSAPP] Sending message to ${to}`);
+  console.log(`📝 [WHATSAPP] Message: "${message}"`);
+
   const response = await fetch(WA_API_URL, {
     method: "POST",
     headers: {
@@ -22,9 +25,11 @@ export async function sendWhatsAppMessage(
 
   if (!response.ok) {
     const errorData = await response.json();
-    console.error("WhatsApp API error:", errorData);
+    console.error("❌ [WHATSAPP] API error:", errorData);
     throw new Error(`WhatsApp API error: ${response.status}`);
   }
+
+  console.log(`✅ [WHATSAPP] Message sent successfully to ${to}`);
 }
 
 export function formatTransactionReply(

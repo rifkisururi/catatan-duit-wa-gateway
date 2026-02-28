@@ -42,6 +42,7 @@ export type GeminiResult = TransactionExtraction | NonTransactionReply;
 export async function extractTransaction(
   message: string
 ): Promise<GeminiResult> {
+  console.log(`🤖 [GEMINI] Extracting transaction from message: "${message}"`);
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
     systemInstruction: SYSTEM_PROMPT,
@@ -50,8 +51,10 @@ export async function extractTransaction(
   const todayDate = format(new Date(), "yyyy-MM-dd");
   const userPrompt = `User message: "${message}"\nToday's date: ${todayDate}`;
 
+  console.log(`📝 [GEMINI] Sending prompt to AI...`);
   const result = await model.generateContent(userPrompt);
   const responseText = result.response.text();
+  console.log(`📥 [GEMINI] Raw response: ${responseText}`);
 
   // Clean markdown fences if present
   const cleaned = responseText
@@ -60,5 +63,6 @@ export async function extractTransaction(
     .trim();
 
   const parsed = JSON.parse(cleaned) as GeminiResult;
+  console.log(`✅ [GEMINI] Parsed result:`, JSON.stringify(parsed, null, 2));
   return parsed;
 }
