@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Search, MessageCircle, TrendingUp } from "lucide-react";
 
 interface User {
@@ -25,7 +24,6 @@ interface UserListProps {
 export default function UserList({ users, selectedUserId }: UserListProps) {
   const [search, setSearch] = useState("");
   const router = useRouter();
-  const pathname = usePathname();
 
   const filteredUsers = users.filter(
     (user) =>

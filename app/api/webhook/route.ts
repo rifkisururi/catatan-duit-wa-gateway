@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { extractTransaction } from "@/lib/gemini";
 import { sendWhatsAppMessage, formatTransactionReply } from "@/lib/whatsapp";
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/webhook - WhatsApp webhook verification
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

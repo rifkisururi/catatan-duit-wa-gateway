@@ -2,7 +2,6 @@
 
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { Badge } from "@/components/ui/badge";
 import TransactionBadge from "./TransactionBadge";
 import { Bot, User } from "lucide-react";
 

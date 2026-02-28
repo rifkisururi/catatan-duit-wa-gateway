@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/admin/Sidebar";
 import UserList from "@/components/admin/UserList";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, TrendingUp, MessageSquare, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
