@@ -162,7 +162,7 @@ export default function PrivacyPage() {
                   Anda memiliki hak penuh untuk mengontrol komunikasi WhatsApp dari layanan kami:
                 </p>
                 <ul className="text-sm text-orange-800 space-y-2 list-disc list-inside">
-                  <li><strong>Berhenti Menerima Pesan:</strong> Anda dapat berhenti menerima pesan dari kami kapan saja dengan membalas "STOP" atau "BERHENTI" ke nomor WhatsApp kami.</li>
+                  <li><strong>Berhenti Menerima Pesan:</strong> Anda dapat berhenti menerima pesan dari kami kapan saja dengan membalas &quot;STOP&quot; atau &quot;BERHENTI&quot; ke nomor WhatsApp kami.</li>
                   <li><strong>Blokir Nomor:</strong> Anda dapat memblokir nomor WhatsApp kami langsung dari aplikasi WhatsApp Anda.</li>
                   <li><strong>Hapus Akun:</strong> Menghapus akun Anda akan menghentikan semua komunikasi WhatsApp dari layanan kami.</li>
                   <li><strong>Hubungi Support:</strong> Anda dapat menghubungi support kami untuk meminta penghapusan data WhatsApp Anda.</li>

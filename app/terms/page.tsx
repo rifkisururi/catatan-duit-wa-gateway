@@ -50,11 +50,11 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Definisi</h2>
               <ul className="text-gray-600 space-y-2 list-disc list-inside">
-                <li><strong>"Layanan"</strong> merujuk pada layanan pencatatan keuangan berbasis WhatsApp yang disediakan oleh NyatetDuit.</li>
-                <li><strong>"Pengguna"</strong> merujuk pada individu atau entitas yang menggunakan Layanan NyatetDuit.</li>
-                <li><strong>"Akun"</strong> merujuk pada akun yang dibuat oleh Pengguna untuk mengakses Layanan.</li>
-                <li><strong>"Data"</strong> merujuk pada informasi keuangan dan transaksi yang dikirimkan oleh Pengguna melalui Layanan.</li>
-                <li><strong>"Google Sheet"</strong> merujuk pada layanan spreadsheet online yang disediakan oleh Google LLC.</li>
+                <li><strong>&quot;Layanan&quot;</strong> merujuk pada layanan pencatatan keuangan berbasis WhatsApp yang disediakan oleh NyatetDuit.</li>
+                <li><strong>&quot;Pengguna&quot;</strong> merujuk pada individu atau entitas yang menggunakan Layanan NyatetDuit.</li>
+                <li><strong>&quot;Akun&quot;</strong> merujuk pada akun yang dibuat oleh Pengguna untuk mengakses Layanan.</li>
+                <li><strong>&quot;Data&quot;</strong> merujuk pada informasi keuangan dan transaksi yang dikirimkan oleh Pengguna melalui Layanan.</li>
+                <li><strong>&quot;Google Sheet&quot;</strong> merujuk pada layanan spreadsheet online yang disediakan oleh Google LLC.</li>
               </ul>
             </section>
 
