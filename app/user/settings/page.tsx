@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Settings, LogOut, Loader2, Save, CheckCircle, AlertCircle, MessageCircle } from "lucide-react";
+import { Settings, LogOut, Loader2, Save, CheckCircle, AlertCircle, MessageCircle, TestTube2 } from "lucide-react";
 
 interface User {
   id: string;
@@ -16,6 +16,7 @@ export default function UserSettingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testingWebhook, setTestingWebhook] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [callbackUrl, setCallbackUrl] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -82,6 +83,42 @@ export default function UserSettingsPage() {
     // Clear session cookie
     document.cookie = "next-auth.session-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     router.push("/user/login");
+  };
+
+  const handleTestWebhook = async () => {
+    setTestingWebhook(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/user/test-webhook", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to test webhook");
+      }
+
+      if (data.success) {
+        setMessage({
+          type: "success",
+          text: `✅ Test webhook berhasil! Payload terkirim ke ${callbackUrl}. Response: ${JSON.stringify(data.response)}`,
+        });
+      } else {
+        setMessage({
+          type: "error",
+          text: data.error || "Test webhook gagal",
+        });
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Terjadi kesalahan saat test webhook",
+      });
+    } finally {
+      setTestingWebhook(false);
+    }
   };
 
   if (loading) {
@@ -200,6 +237,33 @@ export default function UserSettingsPage() {
                 URL ini akan menerima notifikasi setiap kali ada transaksi baru.
                 Pastikan server Anda dapat menerima POST request.
               </p>
+
+              {/* Test Webhook Button */}
+              {callbackUrl && (
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={handleTestWebhook}
+                    disabled={testingWebhook}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+                  >
+                    {testingWebhook ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Mengirim test webhook...
+                      </>
+                    ) : (
+                      <>
+                        <TestTube2 className="w-4 h-4" />
+                        Test Webhook
+                      </>
+                    )}
+                  </button>
+                  <p className="mt-2 text-xs text-gray-500">
+                    Klik tombol ini untuk mengirim payload test ke URL callback Anda.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Example Webhook Payload */}

@@ -6,8 +6,8 @@ import { SessionProvider } from "next-auth/react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FinanceBot - WhatsApp Financial Tracker",
-  description: "Sistem catatan keuangan berbasis WhatsApp Business API",
+  title: "NyatetDuit - Catat Keuangan dengan WhatsApp | Simpan di Google Sheet",
+  description: "Catat keuangan dengan mudah melalui WhatsApp dan simpan otomatis di Google Sheet. Gratis untuk pemula, upgrade untuk fitur lebih lengkap. Mulai sekarang!",
 };
 
 export default function RootLayout({
