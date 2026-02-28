@@ -32,6 +32,39 @@ export async function sendWhatsAppMessage(
   console.log(`✅ [WHATSAPP] Message sent successfully to ${to}`);
 }
 
+export async function sendWhatsAppReaction(
+  to: string,
+  messageId: string,
+  emoji: string
+): Promise<void> {
+  console.log(`📱 [WHATSAPP] Sending reaction ${emoji} to message ${messageId}`);
+  
+  const response = await fetch(WA_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.WA_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to,
+      type: "reaction",
+      reaction: {
+        message_id: messageId,
+        emoji: emoji,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("❌ [WHATSAPP] Reaction API error:", errorData);
+    throw new Error(`WhatsApp API error: ${response.status}`);
+  }
+
+  console.log(`✅ [WHATSAPP] Reaction ${emoji} sent successfully`);
+}
+
 export function formatTransactionReply(
   type: "income" | "expense",
   amount: number,

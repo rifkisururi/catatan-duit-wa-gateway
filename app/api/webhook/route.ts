@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { extractTransaction } from "@/lib/gemini";
-import { sendWhatsAppMessage, formatTransactionReply } from "@/lib/whatsapp";
+import { sendWhatsAppMessage, sendWhatsAppReaction, formatTransactionReply } from "@/lib/whatsapp";
 
 export const dynamic = 'force-dynamic';
 
@@ -58,6 +58,14 @@ export async function POST(request: NextRequest) {
 
     console.log(`👤 [WEBHOOK] From: ${phoneNumber} (${userName})`);
     console.log(`📝 [WEBHOOK] Message: "${rawMessage}"`);
+
+    // Send loading reaction
+    try {
+      await sendWhatsAppReaction(phoneNumber, message.id, "🎉");
+      console.log(`🎉 [WEBHOOK] Loading reaction sent`);
+    } catch (reactionError) {
+      console.error("⚠️  [WEBHOOK] Failed to send loading reaction:", reactionError);
+    }
 
     // Auto-register user if not exists
     console.log(`🔍 [WEBHOOK] Checking if user exists: ${phoneNumber}`);
@@ -142,6 +150,14 @@ export async function POST(request: NextRequest) {
     try {
       await sendWhatsAppMessage(phoneNumber, replyMessage);
       console.log(`✅ [WEBHOOK] Reply sent successfully`);
+      
+      // Send success reaction
+      try {
+        await sendWhatsAppReaction(phoneNumber, message.id, "✅");
+        console.log(`✅ [WEBHOOK] Success reaction sent`);
+      } catch (reactionError) {
+        console.error("⚠️  [WEBHOOK] Failed to send success reaction:", reactionError);
+      }
     } catch (waError) {
       console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
     }
