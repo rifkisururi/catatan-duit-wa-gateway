@@ -48,6 +48,16 @@ export default function ChatWindow({
       if (response.ok) {
         const data = await response.json();
         setChatLogs(data.chatLogs);
+
+        // Calculate time left based on last message sent time
+        if (data.chatLogs && data.chatLogs.length > 0) {
+          const lastMessage = data.chatLogs[0];
+          const lastMessageTime = new Date(lastMessage.sentAt);
+          const now = new Date();
+          const diffInSeconds = Math.floor((now.getTime() - lastMessageTime.getTime()) / 1000);
+          const timeLeft = Math.max(0, 86400 - diffInSeconds); // 24 hours - elapsed time
+          setTimeLeft(timeLeft);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch chat logs:", error);
@@ -70,7 +80,8 @@ export default function ChatWindow({
 
   // Countdown timer - counts down every second
   useEffect(() => {
-    if (timeLeft > 0) {
+    // Only start timer if there are chat logs
+    if (chatLogs.length > 0 && timeLeft > 0) {
       const countdownTimer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -83,13 +94,7 @@ export default function ChatWindow({
 
       return () => clearInterval(countdownTimer);
     }
-
-    return () => {
-      if (countdownTimerRef.current) {
-        clearInterval(countdownTimerRef.current);
-      }
-    };
-  }, []);
+  }, [chatLogs.length]); // Only re-run when chat logs change, not on every timeLeft update
 
   const handleSendMessage = async () => {
     if (!message.trim() || sending) return;
@@ -136,9 +141,9 @@ export default function ChatWindow({
 
   // Get countdown color
   const getCountdownColor = (seconds: number) => {
-    if (seconds <= 60) return "text-red-500"; // Less than 1 minute - urgent
-    if (seconds <= 120) return "text-orange-500"; // Less than 2 minutes - warning
-    return "text-yellow-500"; // Less than 3 minutes - normal
+    if (seconds <= 3600) return "text-red-500"; // Less than 1 hour - urgent
+    if (seconds <= 28800) return "text-orange-500"; // Less than 8 hours - warning
+    return "text-yellow-500"; // Less than 24 hours - normal
   };
 
   if (loading) {
