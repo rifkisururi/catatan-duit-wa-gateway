@@ -48,7 +48,7 @@ cp .env.example .env.local
 | `WA_PHONE_NUMBER_ID` | WhatsApp phone number ID dari Meta |
 | `WA_VERIFY_TOKEN` | Token verifikasi webhook (buat sendiri) |
 | `NEXTAUTH_SECRET` | Secret untuk JWT (min 32 chars) |
-| `NEXTAUTH_URL` | URL aplikasi (http://localhost:3000 untuk dev) |
+| `NEXTAUTH_URL` | Opsional - URL aplikasi production (auto-detect untuk dev) |
 
 ### 3. Setup Database (Neon)
 
@@ -63,15 +63,21 @@ cp .env.example .env.local
 npx prisma generate
 ```
 
-### 5. Buat Admin Pertama
+### 5. Run Development
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/setup \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"password123","name":"Admin"}'
+npm run dev
 ```
 
-### 6. Setup WhatsApp Webhook
+Admin default akan dibuat otomatis:
+- Email: `admin@financebot.com`
+- Password: `admin123`
+
+⚠️ **Penting**: Ganti password setelah login pertama untuk keamanan!
+
+Buka [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+
+### 6. Setup WhatsApp Webhook (Opsional)
 
 1. Buka [Meta Developer Console](https://developers.facebook.com/apps/)
 2. Buat/pilih app WhatsApp Business
@@ -79,19 +85,19 @@ curl -X POST http://localhost:3000/api/auth/setup \
 4. Verify token: sama dengan `WA_VERIFY_TOKEN` di `.env.local`
 5. Subscribe ke event: `messages`
 
-### 7. Run Development
+### 7. Run Development (Opsional - sudah dijalankan di step 5)
 
 ```bash
 npm run dev
 ```
-
-Buka [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
 
 ## Deployment ke Vercel
 
 1. Push ke GitHub
 2. Import project di [vercel.com](https://vercel.com)
 3. Tambahkan semua environment variables
+   - Untuk production, tambahkan `NEXTAUTH_URL` dengan domain Vercel Anda
+   - Contoh: `NEXTAUTH_URL=https://your-app.vercel.app`
 4. Deploy!
 
 ## Struktur Folder
