@@ -44,7 +44,7 @@ export async function extractTransaction(
 ): Promise<GeminiResult> {
   console.log(`🤖 [GEMINI] Extracting transaction from message: "${message}"`);
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-pro",
     systemInstruction: SYSTEM_PROMPT,
   });
 
