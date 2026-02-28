@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search, MessageCircle, TrendingUp, Clock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { id } from "date-fns/locale";
 
 interface User {
   id: string;
@@ -49,24 +47,6 @@ export default function UserList({ users, selectedUserId }: UserListProps) {
 
   const handleUserClick = (userId: string) => {
     router.push(`/admin/users/${userId}/chat`);
-  };
-
-  const getTimeSinceLastMessage = (lastMessageAt: string | Date | null | undefined) => {
-    if (!lastMessageAt) return null;
-    const time = formatDistanceToNow(new Date(lastMessageAt), {
-      addSuffix: true,
-      locale: id,
-    });
-    return time;
-  };
-
-  const getTimeColor = (lastMessageAt: string | Date | null | undefined) => {
-    if (!lastMessageAt) return "text-gray-400";
-    const hoursSince = (now.getTime() - new Date(lastMessageAt).getTime()) / (1000 * 60 * 60);
-    if (hoursSince > 24) return "text-red-500"; // More than 24 hours
-    if (hoursSince > 8) return "text-orange-500"; // More than 8 hours
-    if (hoursSince > 2) return "text-yellow-500"; // More than 2 hours
-    return "text-green-500"; // Less than 2 hours
   };
 
   // Calculate time left for free chat (24 hours from last message)

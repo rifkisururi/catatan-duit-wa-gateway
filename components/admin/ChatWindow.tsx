@@ -38,7 +38,6 @@ export default function ChatWindow({
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(86400); // 24 hours in seconds
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchChatLogs = useCallback(async () => {
     try {
@@ -94,6 +93,7 @@ export default function ChatWindow({
 
       return () => clearInterval(countdownTimer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatLogs.length]); // Only re-run when chat logs change, not on every timeLeft update
 
   const handleSendMessage = async () => {

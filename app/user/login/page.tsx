@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { MessageCircle, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
-export default function UserLoginPage() {
-  const router = useRouter();
+function UserLoginPageContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
@@ -260,5 +259,13 @@ export default function UserLoginPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function UserLoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserLoginPageContent />
+    </Suspense>
   );
 }

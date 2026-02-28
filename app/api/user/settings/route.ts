@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { verify } from "jsonwebtoken";
+import { verify, JwtPayload } from "jsonwebtoken";
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,7 @@ async function getUserFromRequest(request: NextRequest) {
 
   try {
     const jwtSecret = process.env.NEXTAUTH_SECRET || "default-secret";
-    const decoded = verify(sessionToken, jwtSecret) as any;
+    const decoded = verify(sessionToken, jwtSecret) as JwtPayload & { id: string };
     if (!decoded || !decoded.id) {
       return null;
     }
@@ -90,7 +90,7 @@ export async function PATCH(request: NextRequest) {
             { status: 400 }
           );
         }
-      } catch (error) {
+      } catch {
         return NextResponse.json(
           { error: "Invalid URL format" },
           { status: 400 }

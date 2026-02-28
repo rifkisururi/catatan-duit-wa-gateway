@@ -1,22 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Settings, LogOut, Loader2, Save, CheckCircle, AlertCircle, MessageCircle } from "lucide-react";
+
+interface User {
+  id: string;
+  phoneNumber: string;
+  name: string;
+  email: string | null;
+  callbackUrl: string | null;
+}
 
 export default function UserSettingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [callbackUrl, setCallbackUrl] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       const response = await fetch("/api/user/settings");
       if (response.ok) {
@@ -36,7 +40,11 @@ export default function UserSettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
