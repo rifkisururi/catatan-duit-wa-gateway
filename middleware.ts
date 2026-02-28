@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/middleware-auth";
 import { NextResponse } from "next/server";
 
 export default auth((req) => {
@@ -27,19 +27,15 @@ export default auth((req) => {
   if (isUserRoute && !isUserLoginPage) {
     const sessionToken = req.cookies.get("next-auth.session-token")?.value;
     isUserLoggedIn = !!sessionToken;
-    console.log(`🔍 [MIDDLEWARE] Checking user session for ${nextUrl.pathname}`);
-    console.log(`🍪 [MIDDLEWARE] Session token exists: ${isUserLoggedIn}`);
   }
 
   // Protect user routes (except login and verify)
   if (isUserRoute && !isUserLoginPage && !isUserVerifyRoute && !isUserLoggedIn) {
-    console.log(`🚫 [MIDDLEWARE] Redirecting to login (not authenticated)`);
     return NextResponse.redirect(new URL("/user/login", nextUrl));
   }
 
   // Redirect logged-in users from login page to settings
   if (isUserLoginPage && isUserLoggedIn) {
-    console.log(`✅ [MIDDLEWARE] Redirecting to settings (already logged in)`);
     return NextResponse.redirect(new URL("/user/settings", nextUrl));
   }
 
