@@ -40,10 +40,18 @@ Copy `.env.example` ke `.env.local` dan isi semua nilai:
 cp .env.example .env.local
 ```
 
+**Model Gemini yang Tersedia:**
+- `gemini-1.5-pro` - Model terbaru dan paling akurat (default)
+- `gemini-1.5-flash` - Model lebih cepat dan hemat biaya
+- `gemini-1.0-pro` - Model stabil dan teruji
+
+Set `GEMINI_MODEL` di `.env` untuk memilih model yang ingin digunakan.
+
 | Variable | Keterangan |
 |----------|-----------|
 | `DATABASE_URL` | Neon PostgreSQL connection string |
 | `GEMINI_API_KEY` | Google AI Studio API key |
+| `GEMINI_MODEL` | Model Gemini (opsional, default: gemini-1.5-pro) |
 | `WA_ACCESS_TOKEN` | WhatsApp Business API access token |
 | `WA_PHONE_NUMBER_ID` | WhatsApp phone number ID dari Meta |
 | `WA_VERIFY_TOKEN` | Token verifikasi webhook (buat sendiri) |

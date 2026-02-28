@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { format } from "date-fns";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const geminiModel = process.env.GEMINI_MODEL || "gemini-1.5-pro";
 
 const SYSTEM_PROMPT = `You are a financial recording assistant. Your job is to extract financial transaction data from user messages written in Indonesian or English informal language.
 
@@ -43,8 +44,9 @@ export async function extractTransaction(
   message: string
 ): Promise<GeminiResult> {
   console.log(`🤖 [GEMINI] Extracting transaction from message: "${message}"`);
+  console.log(`🤖 [GEMINI] Using model: ${geminiModel}`);
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: geminiModel,
     systemInstruction: SYSTEM_PROMPT,
   });
 
