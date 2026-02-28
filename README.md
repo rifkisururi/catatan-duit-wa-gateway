@@ -100,8 +100,13 @@ User dapat login ke sistem menggunakan WhatsApp:
 3. Klik "Kirim Token Login"
 4. Klik tombol WhatsApp yang muncul
 5. Kirim pesan: `login {TOKEN}` ke nomor sistem
-6. Tunggu balasan dengan link login
-7. Klik link login untuk masuk ke halaman settings
+6. Tunggu balasan dengan tombol CTA (Call to Action)
+7. Klik tombol "🔑 Login Sekarang" untuk langsung masuk ke halaman settings
+
+**Fitur CTA Button:**
+- Sistem akan mengirim pesan dengan tombol "🔑 Login Sekarang" yang dapat langsung diklik
+- User tidak perlu menyalin atau mengetik link secara manual
+- Link berlaku selama 5 menit setelah dikirim
 
 ### Halaman Settings User
 

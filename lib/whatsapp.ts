@@ -78,3 +78,58 @@ export function formatTransactionReply(
 
   return `✅ *${typeLabel} tercatat!*\n💰 Rp${formattedAmount}\n🏷️ ${category}\n📝 ${note}\n📅 ${formattedDate}`;
 }
+
+export async function sendWhatsAppCTAButton(
+  to: string,
+  headerText: string,
+  bodyText: string,
+  buttonText: string,
+  url: string
+): Promise<void> {
+  console.log(`📱 [WHATSAPP] Sending CTA button to ${to}`);
+  console.log(`📝 [WHATSAPP] Header: "${headerText}"`);
+  console.log(`📝 [WHATSAPP] Body: "${bodyText}"`);
+  console.log(`📝 [WHATSAPP] Button: "${buttonText}"`);
+  console.log(`📝 [WHATSAPP] URL: "${url}"`);
+
+  const response = await fetch(WA_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.WA_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to,
+      type: "interactive",
+      interactive: {
+        type: "cta_url",
+        header: {
+          type: "text",
+          text: headerText,
+        },
+        body: {
+          text: bodyText,
+        },
+        footer: {
+          text: "⏰ Link ini berlaku selama 5 menit",
+        },
+        action: {
+          name: "cta_url",
+          parameters: {
+            display_text: buttonText,
+            url: url,
+          },
+        },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("❌ [WHATSAPP] CTA button API error:", errorData);
+    throw new Error(`WhatsApp API error: ${response.status}`);
+  }
+
+  console.log(`✅ [WHATSAPP] CTA button sent successfully to ${to}`);
+}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { extractTransaction } from "@/lib/gemini";
-import { sendWhatsAppMessage, sendWhatsAppReaction, formatTransactionReply } from "@/lib/whatsapp";
+import { sendWhatsAppMessage, sendWhatsAppReaction, sendWhatsAppCTAButton, formatTransactionReply } from "@/lib/whatsapp";
 
 export const dynamic = 'force-dynamic';
 
@@ -102,36 +102,48 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      let replyMessage: string;
       if (tokenUser && tokenUser.phoneNumber === phoneNumber) {
         // Token is valid and belongs to this user
         const baseUrl = process.env.NEXTAUTH_URL || request.nextUrl.origin;
         const loginUrl = `${baseUrl}/api/auth/user/verify?token=${token}`;
-        replyMessage = `✅ *Login berhasil!*\n\n🔗 *Link Login:*\n\n${loginUrl}\n\n⏰ Link ini berlaku selama 5 menit.\n\n💡 *Tips:* Ketuk link di atas untuk langsung masuk ke akun Anda.`;
+
         console.log(`✅ [WEBHOOK] Valid login token for user: ${tokenUser.id}`);
+
+        // Send CTA button message via WhatsApp
+        console.log(`📱 [WEBHOOK] Sending CTA button login reply to ${phoneNumber}...`);
+        try {
+          await sendWhatsAppCTAButton(
+            phoneNumber,
+            "✅ Login Berhasil!",
+            "Silakan klik tombol di bawah untuk masuk ke akun Anda.",
+            "🔑 Login Sekarang",
+            loginUrl
+          );
+          console.log(`✅ [WEBHOOK] CTA button login reply sent successfully`);
+
+          // Send success reaction to original message
+          try {
+            await sendWhatsAppReaction(phoneNumber, message.id, "✅");
+            console.log(`✅ [WEBHOOK] Success reaction sent`);
+          } catch (reactionError) {
+            console.error("⚠️  [WEBHOOK] Failed to send success reaction:", reactionError);
+          }
+        } catch (waError) {
+          console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
+        }
       } else {
-        replyMessage = `❌ *Token login tidak valid atau sudah kadaluarsa.*\n\nSilakan minta token baru dari halaman login.`;
+        const invalidLoginMessage = `❌ *Token login tidak valid atau sudah kadaluarsa.*\n\nSilakan minta token baru dari halaman login.`;
         console.log(`⚠️  [WEBHOOK] Invalid login token`);
-      }
 
-      // Send reply via WhatsApp
-      console.log(`📱 [WEBHOOK] Sending login reply to ${phoneNumber}...`);
-      try {
-        await sendWhatsAppMessage(phoneNumber, replyMessage);
-        console.log(`✅ [WEBHOOK] Login reply sent successfully`);
-      } catch (waError) {
-        console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
+        // Send reply via WhatsApp
+        console.log(`📱 [WEBHOOK] Sending login reply to ${phoneNumber}...`);
+        try {
+          await sendWhatsAppMessage(phoneNumber, invalidLoginMessage);
+          console.log(`✅ [WEBHOOK] Login reply sent successfully`);
+        } catch (waError) {
+          console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
+        }
       }
-
-      // Save outbound chat log
-      await prisma.chatLog.create({
-        data: {
-          userId: user.id,
-          phoneNumber,
-          direction: "outbound",
-          message: replyMessage,
-        },
-      });
 
       return NextResponse.json({ status: "login_processed" }, { status: 200 });
     }
