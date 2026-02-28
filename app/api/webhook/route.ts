@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { extractTransaction } from "@/lib/gemini";
 import { sendWhatsAppMessage, sendWhatsAppReaction, sendWhatsAppCTAButton, formatTransactionReply } from "@/lib/whatsapp";
+import crypto from "crypto";
 
 export const dynamic = 'force-dynamic';
 
@@ -86,7 +87,57 @@ export async function POST(request: NextRequest) {
       console.log(`✅ [WEBHOOK] User found: ${user.id}`);
     }
 
-    // Check for login command
+    // Check for simple "login" command
+    if (rawMessage.toLowerCase().trim() === 'login') {
+      console.log(`🔐 [WEBHOOK] Simple login command detected`);
+
+      // Generate login token
+      const token = crypto.randomBytes(3).toString('hex').toUpperCase();
+      const tokenExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+      // Save token to user record
+      console.log(`🎫 [WEBHOOK] Generating login token for user: ${user.id}`);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          loginToken: token,
+          loginTokenExpires: tokenExpires,
+        },
+      });
+
+      // Generate login URL
+      const baseUrl = process.env.NEXTAUTH_URL || request.nextUrl.origin;
+      const loginUrl = `${baseUrl}/api/auth/user/verify?token=${token}`;
+
+      console.log(`✅ [WEBHOOK] Login token generated: ${token}`);
+
+      // Send CTA button message via WhatsApp
+      console.log(`📱 [WEBHOOK] Sending login link to ${phoneNumber}...`);
+      try {
+        await sendWhatsAppCTAButton(
+          phoneNumber,
+          "🔑 Link Login",
+          `Halo ${userName}! Berikut adalah link login Anda. Link ini berlaku selama 5 menit.`,
+          "🚀 Login Sekarang",
+          loginUrl
+        );
+        console.log(`✅ [WEBHOOK] Login link sent successfully`);
+
+        // Send success reaction
+        try {
+          await sendWhatsAppReaction(phoneNumber, message.id, "✅");
+          console.log(`✅ [WEBHOOK] Success reaction sent`);
+        } catch (reactionError) {
+          console.error("⚠️  [WEBHOOK] Failed to send success reaction:", reactionError);
+        }
+      } catch (waError) {
+        console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
+      }
+
+      return NextResponse.json({ status: "login_sent" }, { status: 200 });
+    }
+
+    // Check for login command with token
     const loginMatch = rawMessage.toLowerCase().match(/^login\s+([a-f0-9]{6})$/i);
     if (loginMatch) {
       const token = loginMatch[1].toUpperCase();

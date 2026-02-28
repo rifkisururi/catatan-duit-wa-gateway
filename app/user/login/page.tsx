@@ -76,6 +76,31 @@ function UserLoginPageContent() {
           </p>
         </div>
 
+        {/* Quick Login Info */}
+        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-lg">⚡</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-800 mb-1">
+                Cara Cepat Login (Disarankan)
+              </h3>
+              <p className="text-sm text-green-700 mb-2">
+                Cukup kirim pesan <strong>&quot;login&quot;</strong> ke WhatsApp kami, dan Anda akan menerima link login langsung!
+              </p>
+              <ol className="text-xs text-green-600 space-y-1 list-decimal list-inside">
+                <li>Buka WhatsApp</li>
+                <li>Kirim pesan: <code className="bg-green-100 px-1.5 py-0.5 rounded font-mono">login</code></li>
+                <li>Terima link login via WhatsApp</li>
+                <li>Klik link untuk masuk</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -101,9 +126,17 @@ function UserLoginPageContent() {
         {!tokenData ? (
           /* Login Form */
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">
-              Masuk dengan WhatsApp
-            </h2>
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <span className="text-gray-600 text-lg">📱</span>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Cara Tradisional
+              </h2>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              Masukkan nomor WhatsApp Anda untuk mendapatkan token login
+            </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -180,7 +213,7 @@ function UserLoginPageContent() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-700">
-                    Kirim pesan &quot;login &#123;token&#125;&quot; ke sistem
+                    Kirim pesan &quot;login &amp;#123;token&amp;#125;&quot; ke sistem
                   </p>
                 </div>
               </div>

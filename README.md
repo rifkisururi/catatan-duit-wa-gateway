@@ -21,7 +21,8 @@ Sistem catatan keuangan berbasis WhatsApp Business API dengan AI (Google Gemini)
 - 📱 **Manual Reply**: Admin bisa kirim pesan manual ke user
 - 🔄 **Auto Polling**: Chat refresh otomatis setiap 5 detik
 - 📈 **Transaction Reports**: Filter dan laporan transaksi lengkap
-- 🔐 **User Login**: Login user via WhatsApp dengan token
+- ⚡ **Quick Login**: Login user cepat dengan mengirim "login" via WhatsApp
+- 🔐 **User Login**: Login user via WhatsApp dengan token (opsional)
 - ⚙️ **User Settings**: User dapat mengatur webhook callback URL
 - 📲 **Mobile First**: Desain mobile-friendly untuk semua halaman user
 
@@ -93,7 +94,21 @@ Buka [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
 
 ### Cara Login User
 
-User dapat login ke sistem menggunakan WhatsApp:
+User dapat login ke sistem menggunakan WhatsApp dengan dua cara:
+
+#### ⚡ Cara Cepat (Disarankan)
+
+1. Buka WhatsApp
+2. Kirim pesan: `login` ke nomor sistem
+3. Tunggu balasan dengan tombol CTA (Call to Action)
+4. Klik tombol "🚀 Login Sekarang" untuk langsung masuk ke halaman settings
+
+**Keuntungan:**
+- Lebih cepat (2 langkah saja)
+- Tidak perlu mengunjungi halaman login
+- Berjalan sepenuhnya di WhatsApp
+
+#### 📱 Cara Tradisional
 
 1. Buka [http://localhost:3000/user/login](http://localhost:3000/user/login)
 2. Masukkan nomor WhatsApp (dengan kode negara, contoh: 6281234567890)
@@ -104,7 +119,7 @@ User dapat login ke sistem menggunakan WhatsApp:
 7. Klik tombol "🔑 Login Sekarang" untuk langsung masuk ke halaman settings
 
 **Fitur CTA Button:**
-- Sistem akan mengirim pesan dengan tombol "🔑 Login Sekarang" yang dapat langsung diklik
+- Sistem akan mengirim pesan dengan tombol login yang dapat langsung diklik
 - User tidak perlu menyalin atau mengetik link secara manual
 - Link berlaku selama 5 menit setelah dikirim
 
