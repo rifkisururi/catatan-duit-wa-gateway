@@ -126,6 +126,16 @@ export default function UserList({ users, selectedUserId }: UserListProps) {
                     {user.phoneNumber}
                   </p>
                 </div>
+                {/* Countdown timer for selected user */}
+                {selectedUserId === user.id && user.lastMessageAt && (() => {
+                  const timeLeft = getTimeLeft(user.lastMessageAt);
+                  return timeLeft !== null && timeLeft > 0 ? (
+                    <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${getCountdownColor(timeLeft)} bg-opacity-10`}>
+                      <Clock className="h-3 w-3" />
+                      <span>{formatTimeLeft(timeLeft)}</span>
+                    </div>
+                  ) : null;
+                })()}
               </div>
               <div className="flex items-center gap-3 mt-2">
                 <div className="flex items-center gap-1 text-xs text-gray-500">
