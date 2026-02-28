@@ -21,6 +21,9 @@ Sistem catatan keuangan berbasis WhatsApp Business API dengan AI (Google Gemini)
 - 📱 **Manual Reply**: Admin bisa kirim pesan manual ke user
 - 🔄 **Auto Polling**: Chat refresh otomatis setiap 5 detik
 - 📈 **Transaction Reports**: Filter dan laporan transaksi lengkap
+- 🔐 **User Login**: Login user via WhatsApp dengan token
+- ⚙️ **User Settings**: User dapat mengatur webhook callback URL
+- 📲 **Mobile First**: Desain mobile-friendly untuk semua halaman user
 
 ## Setup
 
@@ -55,6 +58,7 @@ Set `GEMINI_MODEL` di `.env` untuk memilih model yang ingin digunakan.
 | `WA_ACCESS_TOKEN` | WhatsApp Business API access token |
 | `WA_PHONE_NUMBER_ID` | WhatsApp phone number ID dari Meta |
 | `WA_VERIFY_TOKEN` | Token verifikasi webhook (buat sendiri) |
+| `WA_SYSTEM_PHONE_NUMBER` | Nomor HP sistem untuk menerima pesan login user |
 | `NEXTAUTH_SECRET` | Secret untuk JWT (min 32 chars) |
 | `NEXTAUTH_URL` | Opsional - URL aplikasi production (auto-detect untuk dev) |
 
@@ -84,6 +88,53 @@ Admin default akan dibuat otomatis:
 ⚠️ **Penting**: Ganti password setelah login pertama untuk keamanan!
 
 Buka [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+
+## User Login & Settings
+
+### Cara Login User
+
+User dapat login ke sistem menggunakan WhatsApp:
+
+1. Buka [http://localhost:3000/user/login](http://localhost:3000/user/login)
+2. Masukkan nomor WhatsApp (dengan kode negara, contoh: 6281234567890)
+3. Klik "Kirim Token Login"
+4. Klik tombol WhatsApp yang muncul
+5. Kirim pesan: `login {TOKEN}` ke nomor sistem
+6. Tunggu balasan dengan link login
+7. Klik link login untuk masuk ke halaman settings
+
+### Halaman Settings User
+
+Setelah login, user dapat:
+
+- Melihat informasi profil (nama, nomor HP, email)
+- Mengatur webhook callback URL untuk menerima notifikasi transaksi
+- Melihat contoh payload webhook
+- Logout dari sistem
+
+### Webhook Callback
+
+Sistem akan mengirim POST request ke callback URL user setiap kali ada transaksi baru:
+
+**Contoh Payload:**
+```json
+{
+  "transactionId": "uuid",
+  "type": "income|expense",
+  "amount": 100000,
+  "category": "Makanan",
+  "note": "Nasi padang",
+  "transactionDate": "2024-02-28",
+  "userId": "uuid",
+  "phoneNumber": "6281234567890"
+}
+```
+
+**Persyaratan:**
+- URL harus menggunakan HTTPS (untuk production)
+- Server harus menerima POST request dengan JSON body
+- Server harus merespon dengan status 200 OK
+- URL harus dapat diakses dari internet
 
 ### 6. Setup WhatsApp Webhook (Opsional)
 
@@ -119,22 +170,28 @@ npm run dev
   /api/users/route.ts            # List users
   /api/auth/[...nextauth]/route.ts  # NextAuth handler
   /api/auth/setup/route.ts       # Setup admin pertama
-  /admin/login/page.tsx          # Halaman login
-  /admin/dashboard/page.tsx      # Dashboard utama
+  /api/auth/user/login/route.ts  # Generate token login user
+  /api/auth/user/verify/route.ts # Verifikasi token & buat session
+  /api/user/settings/route.ts    # User settings (GET + PATCH)
+  /admin/login/page.tsx          # Halaman login admin
+  /admin/dashboard/page.tsx      # Dashboard utama admin
   /admin/users/[userId]/chat/page.tsx  # Chat per user
   /admin/transactions/page.tsx   # Laporan transaksi
+  /user/login/page.tsx           # Halaman login user
+  /user/settings/page.tsx         # Halaman settings user
 /lib
   /db.ts          # Prisma client singleton (Neon adapter)
   /gemini.ts      # Gemini AI extraction
   /whatsapp.ts    # WhatsApp send message
-  /auth.ts        # NextAuth config
+  /auth.ts        # NextAuth config (admin)
+  /user-auth.ts   # NextAuth config (user)
 /components/admin
   Sidebar.tsx
   ChatWindow.tsx
   ChatBubble.tsx
   TransactionBadge.tsx
   UserList.tsx
-/middleware.ts    # Protect /admin/* routes
+/middleware.ts    # Protect /admin/* dan /user/* routes
 /prisma
   schema.prisma
   migrations/init.sql
@@ -174,3 +231,11 @@ Bot menerima pesan informal dalam Bahasa Indonesia atau Inggris:
 | GET | `/api/transactions` | ✅ | Semua transaksi |
 | GET | `/api/users` | ✅ | List semua users |
 | POST | `/api/auth/setup` | - | Setup admin (sekali pakai) |
+| POST | `/api/auth/user/login` | - | Generate token login user |
+| GET | `/api/auth/user/verify?token=` | - | Verifikasi token & buat session |
+| GET | `/api/user/settings` | 👤 | Ambil settings user |
+| PATCH | `/api/user/settings` | 👤 | Update settings user |
+
+**Legend:**
+- ✅ = Admin authentication required
+- 👤 = User authentication required

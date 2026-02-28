@@ -86,6 +86,56 @@ export async function POST(request: NextRequest) {
       console.log(`✅ [WEBHOOK] User found: ${user.id}`);
     }
 
+    // Check for login command
+    const loginMatch = rawMessage.toLowerCase().match(/^login\s+([a-f0-9]{6})$/i);
+    if (loginMatch) {
+      const token = loginMatch[1].toUpperCase();
+      console.log(`🔐 [WEBHOOK] Login command detected with token: ${token}`);
+
+      // Verify token
+      const tokenUser = await prisma.user.findFirst({
+        where: {
+          loginToken: token,
+          loginTokenExpires: {
+            gte: new Date(),
+          },
+        },
+      });
+
+      let replyMessage: string;
+      if (tokenUser && tokenUser.phoneNumber === phoneNumber) {
+        // Token is valid and belongs to this user
+        const baseUrl = process.env.NEXTAUTH_URL || request.nextUrl.origin;
+        const loginUrl = `${baseUrl}/api/auth/user/verify?token=${token}`;
+        replyMessage = `✅ *Login berhasil!*\n\n🔗 *Link Login:*\n\n${loginUrl}\n\n⏰ Link ini berlaku selama 5 menit.\n\n💡 *Tips:* Ketuk link di atas untuk langsung masuk ke akun Anda.`;
+        console.log(`✅ [WEBHOOK] Valid login token for user: ${tokenUser.id}`);
+      } else {
+        replyMessage = `❌ *Token login tidak valid atau sudah kadaluarsa.*\n\nSilakan minta token baru dari halaman login.`;
+        console.log(`⚠️  [WEBHOOK] Invalid login token`);
+      }
+
+      // Send reply via WhatsApp
+      console.log(`📱 [WEBHOOK] Sending login reply to ${phoneNumber}...`);
+      try {
+        await sendWhatsAppMessage(phoneNumber, replyMessage);
+        console.log(`✅ [WEBHOOK] Login reply sent successfully`);
+      } catch (waError) {
+        console.error("❌ [WEBHOOK] WhatsApp send error:", waError);
+      }
+
+      // Save outbound chat log
+      await prisma.chatLog.create({
+        data: {
+          userId: user.id,
+          phoneNumber,
+          direction: "outbound",
+          message: replyMessage,
+        },
+      });
+
+      return NextResponse.json({ status: "login_processed" }, { status: 200 });
+    }
+
     // Save inbound chat log
     console.log(`💾 [WEBHOOK] Saving inbound chat log...`);
     const inboundLog = await prisma.chatLog.create({

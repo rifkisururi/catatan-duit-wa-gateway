@@ -10,13 +10,16 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  phoneNumber String        @unique
-  name        String
-  email       String?       @unique
-  createdAt   DateTime      @default(now())
-  transactions Transaction[]
-  chatLogs    ChatLog[]
+  id                String        @id @default(uuid())
+  phoneNumber       String        @unique
+  name              String
+  email             String?       @unique
+  callbackUrl       String?
+  loginToken        String?
+  loginTokenExpires DateTime?
+  createdAt         DateTime      @default(now())
+  transactions      Transaction[]
+  chatLogs          ChatLog[]
 
   @@map("users")
 }
