@@ -37,8 +37,18 @@ export default async function ChatPage({ params }: ChatPageProps) {
           chatLogs: true,
         },
       },
+      chatLogs: {
+        orderBy: { sentAt: "desc" },
+        take: 1,
+      },
     },
   });
+
+  // Add lastMessageAt from the most recent chat log
+  const usersWithLastMessage = users.map((user) => ({
+    ...user,
+    lastMessageAt: user.chatLogs[0]?.sentAt || null,
+  }));
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -62,7 +72,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
             </h2>
           </div>
           <div className="flex-1 overflow-hidden">
-            <UserList users={users} selectedUserId={params.userId} />
+            <UserList users={usersWithLastMessage} selectedUserId={params.userId} />
           </div>
         </div>
 

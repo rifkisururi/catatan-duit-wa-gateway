@@ -27,7 +27,13 @@ interface UserListProps {
 export default function UserList({ users, selectedUserId }: UserListProps) {
   const [search, setSearch] = useState("");
   const [now, setNow] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  // Set mounted state to true after component mounts
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Update current time every second for countdown timer
   useEffect(() => {
@@ -126,8 +132,8 @@ export default function UserList({ users, selectedUserId }: UserListProps) {
                     {user.phoneNumber}
                   </p>
                 </div>
-                {/* Countdown timer for all users */}
-                {user.lastMessageAt && (() => {
+                {/* Countdown timer for all users - only render after mount to avoid hydration error */}
+                {mounted && user.lastMessageAt && (() => {
                   const timeLeft = getTimeLeft(user.lastMessageAt);
                   return timeLeft !== null && timeLeft > 0 ? (
                     <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${getCountdownColor(timeLeft)} bg-opacity-10`}>
@@ -146,23 +152,6 @@ export default function UserList({ users, selectedUserId }: UserListProps) {
                   <MessageCircle className="h-3 w-3" />
                   <span>{user._count.chatLogs} pesan</span>
                 </div>
-                {user.lastMessageAt && (
-                  <>
-                    <div className={`flex items-center gap-1 text-xs ${getTimeColor(user.lastMessageAt)}`}>
-                      <Clock className="h-3 w-3" />
-                      <span>{getTimeSinceLastMessage(user.lastMessageAt)}</span>
-                    </div>
-                    {(() => {
-                      const timeLeft = getTimeLeft(user.lastMessageAt);
-                      return timeLeft !== null && timeLeft > 0 ? (
-                        <div className={`flex items-center gap-1 text-xs font-medium ${getCountdownColor(timeLeft)}`}>
-                          <Clock className="h-3 w-3" />
-                          <span>{formatTimeLeft(timeLeft)}</span>
-                        </div>
-                      ) : null;
-                    })()}
-                  </>
-                )}
               </div>
             </div>
           ))
