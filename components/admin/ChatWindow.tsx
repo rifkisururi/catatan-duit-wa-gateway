@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ChatBubble from "./ChatBubble";
-import { Send, RefreshCw } from "lucide-react";
+import { Send, RefreshCw, Clock } from "lucide-react";
 
 interface ChatLog {
   id: string;
@@ -36,7 +36,9 @@ export default function ChatWindow({
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchChatLogs = useCallback(async () => {
     try {
@@ -65,6 +67,29 @@ export default function ChatWindow({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatLogs]);
+
+  // Countdown timer - counts down every second
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const countdownTimer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownTimer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownTimer);
+    }
+
+    return () => {
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleSendMessage = async () => {
     if (!message.trim() || sending) return;
@@ -98,6 +123,20 @@ export default function ChatWindow({
     }
   };
 
+  // Format countdown time
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  // Get countdown color
+  const getCountdownColor = (seconds: number) => {
+    if (seconds <= 60) return "text-red-500"; // Less than 1 minute - urgent
+    if (seconds <= 120) return "text-orange-500"; // Less than 2 minutes - warning
+    return "text-yellow-500"; // Less than 3 minutes - normal
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -115,14 +154,21 @@ export default function ChatWindow({
             <h2 className="font-semibold text-gray-900">{userName}</h2>
             <p className="text-sm text-gray-500">{phoneNumber}</p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={fetchChatLogs}
-            className="text-gray-500"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={fetchChatLogs}
+              className="text-gray-500"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            {/* Countdown timer */}
+            <div className={`flex items-center gap-1 ${getCountdownColor(timeLeft)}`}>
+              <Clock className="h-4 w-4" />
+              <span className="text-sm font-medium">{formatTime(timeLeft)}</span>
+            </div>
+          </div>
         </div>
       </div>
 
